@@ -12,24 +12,28 @@ public class ChatClientConsole {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             System.out.println("Connected to chat server");
+            System.out.println("Commands: /nick <name>, /pm <user> <message>");
 
-            // Thread to listen for server messages
+            // Thread to listen for server messages (decrypt on receive)
             new Thread(() -> {
                 String msg;
                 try {
                     while ((msg = in.readLine()) != null) {
-                        System.out.println(msg);
+                        String decrypted = CryptoUtils.decrypt(msg); 
+                        System.out.println(decrypted);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }).start();
 
-            // Main thread sends user input
+            // Main thread sends user input (encrypt before sending)
             String userInput;
             while ((userInput = consoleInput.readLine()) != null) {
-                out.println(userInput);
+                String encrypted = CryptoUtils.encrypt(userInput); 
+                out.println(encrypted);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
